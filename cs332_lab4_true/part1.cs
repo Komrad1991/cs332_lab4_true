@@ -6,13 +6,15 @@ public struct Vec2
 {
     public double X, Y;
     public Vec2(double x, double y) { X = x; Y = y; }
-
+    
+    //утилити
     public static Vec2 operator +(Vec2 a, Vec2 b) => new(a.X + b.X, a.Y + b.Y);
     public static Vec2 operator -(Vec2 a, Vec2 b) => new(a.X - b.X, a.Y - b.Y);
     public static Vec2 operator *(Vec2 a, double k) => new(a.X * k, a.Y * k);
 
     public double Length => Math.Sqrt(X * X + Y * Y);
 
+    //в координатах sixlabors
     public SixLabors.ImageSharp.PointF ToPointF() =>
         new SixLabors.ImageSharp.PointF((float)X, (float)Y);
 }
@@ -20,8 +22,12 @@ public struct Vec2
 /// <summary>Аффинное преобразование 3×3 (однородные координаты).</summary>
 public class Mat3
 {
+
+    //матрица преобразований
     public double[,] M = new double[3, 3];
 
+
+    //единичная матрица
     public static Mat3 Identity()
     {
         var m = new Mat3();
@@ -29,6 +35,8 @@ public class Mat3
         return m;
     }
 
+
+    //сдвиг
     public static Mat3 Translation(double dx, double dy)
     {
         var m = Identity();
@@ -36,6 +44,7 @@ public class Mat3
         return m;
     }
 
+    //поворот (переносим в начало координат, там поворачиваем, возвращаем обратно)
     public static Mat3 Rotation(double angleRad, Vec2 pivot)
     {
         double c = Math.Cos(angleRad), s = Math.Sin(angleRad);
@@ -45,6 +54,7 @@ public class Mat3
         return Translation(pivot.X, pivot.Y) * r * Translation(-pivot.X, -pivot.Y);
     }
 
+    //с масштабом также, перенос + масштаб
     public static Mat3 Scale(double kx, double ky, Vec2 pivot)
     {
         var s = Identity();
@@ -52,6 +62,8 @@ public class Mat3
         return Translation(pivot.X, pivot.Y) * s * Translation(-pivot.X, -pivot.Y);
     }
 
+
+    //утилити
     public static Mat3 operator *(Mat3 a, Mat3 b)
     {
         var r = new Mat3();
@@ -65,6 +77,7 @@ public class Mat3
         return r;
     }
 
+    //матрицу применяем к точке
     public Vec2 Apply(Vec2 p) => new(
         M[0, 0] * p.X + M[0, 1] * p.Y + M[0, 2],
         M[1, 0] * p.X + M[1, 1] * p.Y + M[1, 2]);
@@ -72,6 +85,10 @@ public class Mat3
 
 public static class Geom
 {
+    
+    //пересечение
     public static double Cross(Vec2 a, Vec2 b) => a.X * b.Y - a.Y * b.X;
+
+    //расстояние
     public static double Dist(Vec2 a, Vec2 b) => (a - b).Length;
 }
